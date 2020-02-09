@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuetify from 'vuetify/lib';
 import zhHans from 'vuetify/es5/locale/zh-Hans';
+import colors from 'vuetify/lib/util/colors';
 
 Vue.use(Vuetify);
 
@@ -11,13 +12,13 @@ export default new Vuetify({
 		},
 		themes: {
 			light: {
-				primary: '#ee44aa',
-				secondary: '#424242',
-				accent: '#82B1FF',
+				primary: '#FF90FD',
+				secondary: colors.pink.base,
+				accent: colors.deepPurple.accent2,
 				error: '#FF5252',
 				info: '#2196F3',
 				success: '#4CAF50',
-				warning: '#FFC107',
+				warning: '#FB8C00',
 			},
 		},
 	},

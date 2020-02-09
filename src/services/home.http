@@ -1,0 +1,10 @@
+@host = https://yuewanapi.nn.com/baseUrl/home
+
+GET {{host}}/bannerBackend HTTP/1.1
+Content-Type: application/json
+
+###
+
+GET {{host}}/homeSlideshow HTTP/1.1
+Content-Type: application/json
+
