@@ -9,11 +9,11 @@ export default class PlayerService {
 		this.namespace = `${process.env.VUE_APP_BASE_PATH}/player`;
 	}
 
-	homePlayerList() {
+	playerList() {
 		return this.request.get(this.namespace + '/homePlayerList');
 	}
 
-	homeHotPlayerList() {
+	hotPlayerList() {
 		return this.request.get(this.namespace + '/homeHotPlayerList', {
 			pageSize: 5,
 			pageNum: 1,

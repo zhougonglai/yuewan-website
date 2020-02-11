@@ -55,7 +55,8 @@ export default {
 			margin-right: 50px;
 		}
 		&-nav {
-			line-height: 80px;
+			line-height: 79px;
+			height: 79px;
 			position: relative;
 			font-size: 16px;
 			padding: 0 32px;
@@ -65,25 +66,22 @@ export default {
 			display: flex;
 			align-items: center;
 			justify-content: center;
-			&::after {
-				content: '';
-				position: absolute;
-				bottom: 0;
-				width: 0;
-				height: 4px;
-				transition: width 0.25s linear;
-				will-change: width;
-				background-color: var(--v-primary-base);
-			}
 			&.active {
 				&::after {
-					width: 38%;
+					content: '';
+					position: absolute;
+					bottom: 0;
+					background-color: var(--v-primary-base);
+					border-radius: 4px 4px 0 0;
+					width: 37%;
+					height: 4px;
 				}
 			}
 			&::before {
 				content: '';
 				text-align: center;
 				position: absolute;
+				border-radius: 50%;
 				transition: box-shadow 0.25s linear;
 				will-change: box-shadow;
 				box-shadow: 0 0 0 0 rgba(142, 76, 252, 0);
@@ -92,7 +90,7 @@ export default {
 			&.active {
 				color: var(--v-primary-base);
 				&::before {
-					box-shadow: 0 0 40px 32px rgba(142, 76, 252, 0.35);
+					box-shadow: 0 0 32px 18px var(--v-primary-base);
 				}
 			}
 		}

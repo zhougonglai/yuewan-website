@@ -5,12 +5,12 @@ const homeService = new HomeService();
 const types = chat => Symbol(`GAME_${chat}`).toString();
 
 const state = {
-	homeSlideshow: [],
+	slides: [],
 };
 
 const actions = {
-	async getHomeSlideshow({ commit }) {
-		const { data } = await homeService.homeSlideshow();
+	async getSlides({ commit }) {
+		const { data } = await homeService.slides();
 		commit(types('SLIDE'), data);
 		return data;
 	},
@@ -18,7 +18,7 @@ const actions = {
 
 const mutations = {
 	[types('SLIDE')](state, data) {
-		state.homeSlideshow = data;
+		state.slides = data;
 	},
 };
 

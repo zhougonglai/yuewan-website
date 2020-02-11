@@ -13,7 +13,7 @@ export default class HomeService {
 		return this.request.get(this.namespace + '/bannerBackend');
 	}
 
-	homeSlideshow() {
+	slides() {
 		return this.request.get(this.namespace + '/homeSlideshow');
 	}
 }

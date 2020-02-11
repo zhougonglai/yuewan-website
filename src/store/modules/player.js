@@ -11,12 +11,12 @@ const state = {
 
 const actions = {
 	async getPlayerList({ commit }) {
-		const { data } = await playerService.homePlayerList();
+		const { data } = await playerService.playerList();
 		commit(types('LIST'), data);
 		return data;
 	},
 	async getHotPlayerList({ commit }) {
-		const { data } = await playerService.homeHotPlayerList();
+		const { data } = await playerService.hotPlayerList();
 		commit(types('HOT_LIST'), data);
 		return data;
 	},
