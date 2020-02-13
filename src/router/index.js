@@ -18,6 +18,24 @@ const routes = [
 				component: () =>
 					import(/* webpackChunkName: 'page.home' */ '@pages/Home.vue'),
 			},
+			{
+				path: 'players',
+				name: 'players',
+				meta: {
+					keepAlive: true,
+				},
+				component: () =>
+					import(/* webpackChunkName: 'page.players' */ '@pages/Players.vue'),
+			},
+			{
+				path: 'recharge',
+				name: 'recharge',
+				meta: {
+					keepAlive: true,
+				},
+				component: () =>
+					import(/* webpackChunkName: 'page.recharge' */ '@pages/Recharge.vue'),
+			},
 		],
 	},
 ];

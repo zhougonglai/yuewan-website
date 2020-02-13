@@ -17,15 +17,18 @@
 				.app-header-menu-item 简体中文
 		.prominent
 			.prominent-content
-				.prominent-content-item 首页
-				.prominent-content-item 约玩
-				.prominent-content-item 充值
+				router-link.prominent-content-item(:to="{name: 'home'}" exact) 首页
+				router-link.prominent-content-item(:to="{name: 'players'}" exact) 约玩
+				router-link.prominent-content-item(:to="{name: 'recharge'}" exact) 充值
 				v-spacer
 					.search-bar
 				.prominent-content-item 消息
 				button.app-btn.rounded.outlined.dark.ml-5 陪玩申请入驻
 		v-content#scrolling-techniques.overflow-y-auto
 			router-view
+		v-footer
+			v-col.text-center {{ new Date().getFullYear() }} —
+				strong 雷神科技
 </template>
 <script>
 export default {
@@ -134,7 +137,8 @@ export default {
 			color: #999;
 			padding: 0 16px;
 			cursor: pointer;
-			&:hover {
+			&:hover,
+			&.router-link-active {
 				color: var(--v-primary-base);
 			}
 			& + .prominent-content-item {
@@ -145,5 +149,9 @@ export default {
 }
 #scrolling-techniques {
 	background-image: url('https://www.nn.com/_nuxt/img/a642a1a.png');
+	background-color: #ededed;
+}
+.v-footer::v-deep {
+	background-color: #ededed;
 }
 </style>

@@ -13,4 +13,7 @@ new Vue({
 	store,
 	vuetify,
 	render: h => h(App),
+	mounted() {
+		document.dispatchEvent(new Event('render-event'));
+	},
 }).$mount('#app');

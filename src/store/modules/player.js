@@ -4,6 +4,22 @@ const playerService = new PlayerService();
 
 const types = chat => Symbol(`PLAYER_${chat}`).toString();
 
+class Player {
+	constructor(args) {
+		for (const key in args) {
+			this[key] = args[key];
+		}
+		this._init();
+	}
+
+	_init() {
+		this.voice = this.voiceUrl ? new Audio(this.voiceUrl) : '';
+		if (this.voice) {
+			this.voice.load();
+		}
+	}
+}
+
 const state = {
 	playerList: {},
 	hotPlayerList: [],
@@ -23,11 +39,15 @@ const actions = {
 };
 
 const mutations = {
-	[types('LIST')](state, data) {
-		state.playerList = data;
+	[types('LIST')](state, { hotPlayers, newPlayers, onlinePlayers }) {
+		state.playerList = {
+			hotPlayers,
+			newPlayers: newPlayers.map(player => new Player(player)),
+			onlinePlayers: onlinePlayers.map(player => new Player(player)),
+		};
 	},
-	[types('HOT_LIST')](state, data) {
-		state.hotPlayerList = data;
+	[types('HOT_LIST')](state, { list }) {
+		state.hotPlayerList = { list: list.map(item => new Player(item)) };
 	},
 };
 

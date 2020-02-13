@@ -1,2 +1,7 @@
 @import './reset';
+@import './help';
 @import './components';
+
+:root {
+	--v-primary-rgb: 255, 211, 62;
+}

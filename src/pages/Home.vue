@@ -17,19 +17,58 @@
 						v-img.white--text.align-end(:src="hotPlayer.imageUrl[0]" aspect-ratio="1")
 							.mask.pa-2(v-text="hotPlayer.rankName")
 						v-card-text.d-flex.justify-space-between
-							div(v-text="hotPlayer.nickname")
-							div(v-text="hotPlayer.gameName")
+							div.black--text(v-text="hotPlayer.nickname")
+							b.black--text.large(v-text="hotPlayer.gameName")
+						v-card-actions
+							.voice.brown--text {{hotPlayer.duration}}s
+								svg.icon(aria-hidden="true")
+									use(xlink:href="#icon-voice1")
+							v-spacer
+							.price
+								b.red--text {{hotPlayer.dateMoney}}
+								small.red--text 元/每小时
 		section.new
 			.content
 				v-banner.transparent 新秀
-				v-item-group.d-flex(ref="scrollWarp")
-					div.prev(@click="prev") <
-					div.next(@click="next") >
-					v-item(v-for="(player, i) in playerList.onlinePlayers" :style="{}" :key="`${player.memberNo}-prev`")
-						v-img(:src="player.imageUrl[0]" aspect-ratio="1" width="16.6667%")
-				//- v-item-group.d-flex
-				//- 	v-item(v-for="player in playerList.onlinePlayers" :key="`${player.memberNo}-next`")
-				//- 		v-img(:src="player.imageUrl[0]" aspect-ratio="1" width="20%")
+				.scrollWarp(ref="scrollWarp")
+					div.prev(v-if="scrollIndex > -10" @click="prev") <
+					div.next(v-if="scrollIndex < 10" @click="next") >
+					//- :style="{transform: `translateX(${scrollIndex * 233.333}px)`}"
+					.scrollContent(ref="scrollContent" :style="{transform: `translateX(${scrollIndex * 233.333}px)`}")
+						v-img.cursor.white--text.align-end(v-for="(player) in playerList.onlinePlayers" :key="`${player.memberNo}-prev`" :src="player.imageUrl[0]" aspect-ratio="1" width="233.3333")
+							.mask.pa-2(v-text="player.nickname")
+						v-img.cursor.white--text.align-end(v-for="(player) in playerList.onlinePlayers" :key="player.memberNo" :src="player.imageUrl[0]" aspect-ratio="1" width="233.3333")
+							.mask.pa-2(v-text="player.nickname")
+						v-img.cursor.white--text.align-end(v-for="player in playerList.onlinePlayers" :key="`${player.memberNo}-next`" :src="player.imageUrl[0]" aspect-ratio="1" width="233.3333")
+							.mask.pa-2(v-text="player.nickname")
+		section.online
+			.content
+				v-banner.transparent 当前在线
+				.grid
+					v-card(v-for="player in playerList.onlinePlayers" :key="player.memberNo" hover)
+						v-img.white--text.align-end(:src="player.imageUrl[0]" aspect-ratio="1")
+							.mask.pa-2(v-text="player.rankName")
+						v-card-text.d-flex.justify-space-between
+							div.black--text(v-text="player.nickname")
+							b.black--text.large(v-text="player.gameName")
+						v-card-actions
+							small.gender.grey--text
+								template(v-if="player.gender === 1")
+									svg.icon
+										use(xlink:href="#icon-Man")
+								template(v-else)
+									svg.icon
+										use(xlink:href="#icon-woman")
+								| {{player.age}}
+							small.address.grey--text
+								svg.icon
+									use(xlink:href="#icon-location")
+								|{{player.city}}
+							v-spacer
+							.price
+								b.red--text {{player.dateMoney}}
+								small.red--text 元/每小时
+
 </template>
 
 <script>
@@ -37,6 +76,11 @@ import { mapActions, mapState } from 'vuex';
 
 export default {
 	name: 'Home',
+	data() {
+		return {
+			scrollIndex: 0,
+		};
+	},
 	computed: {
 		...mapState('game', ['gameList']),
 		...mapState('home', ['slides']),
@@ -46,8 +90,12 @@ export default {
 		...mapActions('game', ['getGameList']),
 		...mapActions('home', ['getSlides']),
 		...mapActions('player', ['getPlayerList', 'getHotPlayerList']),
-		prev() {},
-		next() {},
+		prev() {
+			this.scrollIndex -= 1;
+		},
+		next() {
+			this.scrollIndex += 1;
+		},
 	},
 	async mounted() {
 		Promise.all([
@@ -61,8 +109,9 @@ export default {
 </script>
 <style lang="scss" scoped>
 .home {
-	padding-bottom: 50vh;
+	padding-bottom: 16px;
 }
+
 section {
 	.content {
 		width: 1400px;
@@ -100,7 +149,8 @@ section {
 		}
 	}
 	&.hot,
-	&.new {
+	&.new,
+	&.online {
 		display: flex;
 		align-items: center;
 		justify-content: center;
@@ -126,13 +176,15 @@ section {
 			z-index: 1;
 			backdrop-filter: blur(4px);
 		}
-		::v-deep .v-item-group {
+		.scrollWarp {
+			height: 233.33333px;
 			position: relative;
 			display: flex;
 			align-items: center;
 			justify-content: center;
 			.prev {
 				cursor: pointer;
+				user-select: none;
 				position: absolute;
 				left: 15px;
 				top: calc(50% - 25px);
@@ -149,6 +201,7 @@ section {
 			}
 			.next {
 				cursor: pointer;
+				user-select: none;
 				position: absolute;
 				right: 15px;
 				top: calc(50% - 25px);
@@ -163,14 +216,57 @@ section {
 				border-radius: 50%;
 				line-height: 50px;
 			}
+			.scrollContent {
+				height: 233.33333px;
+				transition: transform 0.25s linear;
+				will-change: transform;
+				display: flex;
+			}
 		}
 	}
 	.mask {
 		background-image: linear-gradient(
-			bottom,
+			to top,
 			rgba(0, 0, 0, 0.8),
 			rgba(0, 0, 0, 0)
 		);
+	}
+	.voice {
+		background-color: var(--v-primary-base);
+		border-radius: 15px 15px 15px 0;
+		padding: 0 12px;
+		line-height: 30px;
+		font-size: 16px;
+		transition: box-shadow 0.25s linear;
+		&:hover {
+			box-shadow: 0 0 8px 4px var(--v-primary-darken1);
+		}
+	}
+	.icon {
+		width: 1em;
+		height: 1em;
+		vertical-align: -0.15em;
+		fill: currentColor;
+		overflow: hidden;
+		margin-left: 8px;
+	}
+	.grid {
+		display: grid;
+		grid-template-columns: repeat(5, 1fr);
+		grid-template-rows: repeat(2, 1fr);
+		grid-column-gap: 16px;
+		grid-row-gap: 16px;
+	}
+	::v-deep .v-image {
+		&__image {
+			transform: scale(1);
+			transition: transform 0.3s linear;
+		}
+		&:hover {
+			.v-image__image {
+				transform: scale(1.2);
+			}
+		}
 	}
 }
 </style>

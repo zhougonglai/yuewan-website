@@ -1,6 +1,8 @@
 const pkg = require('./package');
 const webpack = require('webpack');
 const path = require('path');
+const PrerenderSPAPlugin = require('prerender-spa-plugin');
+const Renderer = PrerenderSPAPlugin.PuppeteerRenderer;
 
 const isProd = () => {
 	return process.env.NODE_ENV === 'production';
@@ -79,6 +81,18 @@ module.exports = {
 				banner: `Current version ${
 					pkg.version
 				} and build time ${new Date().toLocaleString()}`,
+			}),
+			new PrerenderSPAPlugin({
+				staticDir: resolve('dist'),
+				routes: ['/', '/players', '/recharge'],
+				renderer: new Renderer({
+					inject: {
+						foo: 'bar',
+					},
+					maxConcurrentRoutes: 4,
+					renderAfterDocumentEvent: 'render-event',
+					headless: true,
+				}),
 			}),
 		],
 	},
