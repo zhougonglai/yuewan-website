@@ -6,3 +6,15 @@ Content-Type: application/json
 
 GET {{host}}/homePlayerList HTTP/1.1
 Content-Type: application/json
+
+
+###
+
+POST {{host}}/playerList HTTP/1.1
+Content-Type: application/json
+
+{
+	"gameId": "ba471d5f29634582b76bbc3dbfc605a4", //服务类型id
+	"pageNum": 1,           //页码
+	"pageSize": 20         //每页条数
+}

@@ -14,7 +14,7 @@
 				v-banner.transparent 热门推荐
 				.d-flex.justify-space-between.mt-3
 					v-card(v-for="hotPlayer in hotPlayerList.list" :key="hotPlayer.memberNo" hover width="19%")
-						v-img.white--text.align-end(:src="hotPlayer.imageUrl[0]" aspect-ratio="1")
+						v-img.hover.white--text.align-end(:src="hotPlayer.imageUrl[0]" aspect-ratio="1")
 							.mask.pa-2(v-text="hotPlayer.rankName")
 						v-card-text.d-flex.justify-space-between
 							div.black--text(v-text="hotPlayer.nickname")
@@ -31,22 +31,19 @@
 			.content
 				v-banner.transparent 新秀
 				.scrollWarp(ref="scrollWarp")
-					div.prev(v-if="scrollIndex > -10" @click="prev") <
-					div.next(v-if="scrollIndex < 10" @click="next") >
-					//- :style="{transform: `translateX(${scrollIndex * 233.333}px)`}"
+					div.prev(v-if="scrollIndex > -5" @click="prev") <
+					div.next(v-if="scrollIndex < 5" @click="next") >
 					.scrollContent(ref="scrollContent" :style="{transform: `translateX(${scrollIndex * 233.333}px)`}")
-						v-img.cursor.white--text.align-end(v-for="(player) in playerList.onlinePlayers" :key="`${player.memberNo}-prev`" :src="player.imageUrl[0]" aspect-ratio="1" width="233.3333")
+						v-img.hover.cursor.white--text.align-end(v-for="player in homePlayerList.newPlayers" :key="`${player.playerNo}-prev`" :src="player.imageUrl[0]" aspect-ratio="1" width="233.3333")
 							.mask.pa-2(v-text="player.nickname")
-						v-img.cursor.white--text.align-end(v-for="(player) in playerList.onlinePlayers" :key="player.memberNo" :src="player.imageUrl[0]" aspect-ratio="1" width="233.3333")
-							.mask.pa-2(v-text="player.nickname")
-						v-img.cursor.white--text.align-end(v-for="player in playerList.onlinePlayers" :key="`${player.memberNo}-next`" :src="player.imageUrl[0]" aspect-ratio="1" width="233.3333")
+						v-img.hover.cursor.white--text.align-end(v-for="player in homePlayerList.newPlayers" :key="`${player.playerNo}-next`" :src="player.imageUrl[0]" aspect-ratio="1" width="233.3333")
 							.mask.pa-2(v-text="player.nickname")
 		section.online
 			.content
 				v-banner.transparent 当前在线
 				.grid
-					v-card(v-for="player in playerList.onlinePlayers" :key="player.memberNo" hover)
-						v-img.white--text.align-end(:src="player.imageUrl[0]" aspect-ratio="1")
+					v-card(v-for="player in homePlayerList.onlinePlayers" :key="player.memberNo" hover)
+						v-img.hover.white--text.align-end(:src="player.imageUrl[0]" aspect-ratio="1")
 							.mask.pa-2(v-text="player.rankName")
 						v-card-text.d-flex.justify-space-between
 							div.black--text(v-text="player.nickname")
@@ -59,7 +56,7 @@
 								template(v-else)
 									svg.icon
 										use(xlink:href="#icon-woman")
-								| {{player.age}}
+								|{{player.age}}
 							small.address.grey--text
 								svg.icon
 									use(xlink:href="#icon-location")
@@ -84,12 +81,12 @@ export default {
 	computed: {
 		...mapState('game', ['gameList']),
 		...mapState('home', ['slides']),
-		...mapState('player', ['playerList', 'hotPlayerList']),
+		...mapState('player', ['homePlayerList', 'hotPlayerList']),
 	},
 	methods: {
 		...mapActions('game', ['getGameList']),
 		...mapActions('home', ['getSlides']),
-		...mapActions('player', ['getPlayerList', 'getHotPlayerList']),
+		...mapActions('player', ['getHomePlayerList', 'getHotPlayerList']),
 		prev() {
 			this.scrollIndex -= 1;
 		},
@@ -102,14 +99,14 @@ export default {
 			this.getGameList(),
 			this.getSlides(),
 			this.getHotPlayerList(),
-			this.getPlayerList(),
+			this.getHomePlayerList(),
 		]);
 	},
 };
 </script>
 <style lang="scss" scoped>
 .home {
-	padding-bottom: 16px;
+	padding-bottom: 32px;
 }
 
 section {
@@ -256,17 +253,6 @@ section {
 		grid-template-rows: repeat(2, 1fr);
 		grid-column-gap: 16px;
 		grid-row-gap: 16px;
-	}
-	::v-deep .v-image {
-		&__image {
-			transform: scale(1);
-			transition: transform 0.3s linear;
-		}
-		&:hover {
-			.v-image__image {
-				transform: scale(1.2);
-			}
-		}
 	}
 }
 </style>

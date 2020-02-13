@@ -21,15 +21,32 @@ class Player {
 }
 
 const state = {
-	playerList: {},
+	playerList: {
+		list: [],
+		total: 0,
+	},
+	homePlayerList: {},
 	hotPlayerList: [],
 };
 
 const actions = {
-	async getPlayerList({ commit }) {
-		const { data } = await playerService.playerList();
-		commit(types('LIST'), data);
+	async getHomePlayerList({ commit }) {
+		const { data } = await playerService.homePlayerList();
+		commit(types('HOME_LIST'), data);
 		return data;
+	},
+	async getPlayerList({ commit, rootState }) {
+		const { data, code } = await playerService.playerList({
+			gameId: rootState.game.search.id,
+			pageNum: 1,
+			pageSize: 20,
+		});
+		if (code) {
+			return;
+		} else {
+			commit(types('LIST'), data);
+			return data;
+		}
 	},
 	async getHotPlayerList({ commit }) {
 		const { data } = await playerService.hotPlayerList();
@@ -39,11 +56,17 @@ const actions = {
 };
 
 const mutations = {
-	[types('LIST')](state, { hotPlayers, newPlayers, onlinePlayers }) {
-		state.playerList = {
+	[types('HOME_LIST')](state, { hotPlayers, newPlayers, onlinePlayers }) {
+		state.homePlayerList = {
 			hotPlayers,
 			newPlayers: newPlayers.map(player => new Player(player)),
 			onlinePlayers: onlinePlayers.map(player => new Player(player)),
+		};
+	},
+	[types('LIST')](state, { total, list }) {
+		state.playerList = {
+			total,
+			list: list.map(player => new Player(player)),
 		};
 	},
 	[types('HOT_LIST')](state, { list }) {

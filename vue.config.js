@@ -1,4 +1,5 @@
 const pkg = require('./package');
+const routes = require('./routes');
 const webpack = require('webpack');
 const path = require('path');
 const PrerenderSPAPlugin = require('prerender-spa-plugin');
@@ -10,12 +11,6 @@ const isProd = () => {
 
 const resolve = dir => {
 	return path.join(__dirname, './', dir);
-};
-
-const routes = {
-	'/recharge': '用户中心',
-	'/players': '游戏陪玩_游戏开黑_美女陪玩_找陪玩找NN约玩',
-	'/': '高端陪玩_趣味开黑_玩游戏找陪玩上NN约玩【NN约玩官网】',
 };
 
 module.exports = {
@@ -95,7 +90,7 @@ module.exports = {
 					renderedRoute.route = renderedRoute.originalRoute;
 					renderedRoute.html = renderedRoute.html.replace(
 						/<title>[^<]*<\/title>/i,
-						'<title>' + routes[renderedRoute.route] + '</title>',
+						'<title>' + routes[renderedRoute.route].title + '</title>',
 					);
 					if (renderedRoute.route.endsWith('.html')) {
 						renderedRoute.outputPath = path.join(

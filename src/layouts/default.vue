@@ -18,7 +18,7 @@
 		.prominent
 			.prominent-content
 				router-link.prominent-content-item(:to="{name: 'home'}" exact) 首页
-				router-link.prominent-content-item(:to="{name: 'players'}" exact) 约玩
+				router-link.prominent-content-item(:to="{name: 'players', query: {id: search.id}}") 约玩
 				router-link.prominent-content-item(:to="{name: 'recharge'}" exact) 充值
 				v-spacer
 					.search-bar
@@ -31,12 +31,23 @@
 				strong 雷神科技
 </template>
 <script>
+import { mapState, mapActions } from 'vuex';
+
 export default {
 	name: 'default',
 	data() {
 		return {
 			bottomNav: 3,
 		};
+	},
+	computed: {
+		...mapState('game', ['search']),
+	},
+	methods: {
+		...mapActions('game', ['getGameList']),
+	},
+	async created() {
+		Promise.all([this.getGameList()]);
 	},
 };
 </script>

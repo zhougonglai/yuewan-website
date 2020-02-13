@@ -2,6 +2,20 @@
 	border-bottom: none !important;
 }
 
+.v-image {
+	&.hover {
+		.v-image__image {
+			transform: scale(1);
+			transition: transform 0.3s linear;
+		}
+		&:hover {
+			.v-image__image {
+				transform: scale(1.2);
+			}
+		}
+	}
+}
+
 a {
 	text-decoration: none;
 }

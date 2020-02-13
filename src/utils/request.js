@@ -28,7 +28,9 @@ export default class Request {
 		return fetch(this.baseUrl + path, {
 			method: 'POST',
 			body: JSON.stringify(body),
-			'Content-Type': 'application/json', // application/x-www-form-urlencoded
+			headers: {
+				'Content-Type': 'application/json', // application/x-www-form-urlencoded
+			},
 			signal,
 			...this.init,
 			...requestInit,

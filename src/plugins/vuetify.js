@@ -6,6 +6,12 @@ import colors from 'vuetify/lib/util/colors';
 Vue.use(Vuetify);
 
 export default new Vuetify({
+	breakpoint: {
+		thresholds: {
+			md: 1280,
+			lg: 1400,
+		},
+	},
 	theme: {
 		options: {
 			customProperties: true,
