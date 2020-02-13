@@ -12,6 +12,12 @@ const resolve = dir => {
 	return path.join(__dirname, './', dir);
 };
 
+const routes = {
+	'/recharge': '用户中心',
+	'/players': '游戏陪玩_游戏开黑_美女陪玩_找陪玩找NN约玩',
+	'/': '高端陪玩_趣味开黑_玩游戏找陪玩上NN约玩【NN约玩官网】',
+};
+
 module.exports = {
 	transpileDependencies: ['vuetify'],
 	devServer: {
@@ -85,6 +91,22 @@ module.exports = {
 			new PrerenderSPAPlugin({
 				staticDir: resolve('dist'),
 				routes: ['/', '/players', '/recharge'],
+				postProcess(renderedRoute) {
+					renderedRoute.route = renderedRoute.originalRoute;
+					renderedRoute.html = renderedRoute.html.replace(
+						/<title>[^<]*<\/title>/i,
+						'<title>' + routes[renderedRoute.route] + '</title>',
+					);
+					if (renderedRoute.route.endsWith('.html')) {
+						renderedRoute.outputPath = path.join(
+							__dirname,
+							'dist',
+							renderedRoute.route,
+						);
+					}
+
+					return renderedRoute;
+				},
 				renderer: new Renderer({
 					inject: {
 						foo: 'bar',
