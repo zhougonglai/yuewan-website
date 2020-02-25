@@ -103,9 +103,6 @@ module.exports = {
 					return renderedRoute;
 				},
 				renderer: new Renderer({
-					inject: {
-						foo: 'bar',
-					},
 					maxConcurrentRoutes: 4,
 					renderAfterDocumentEvent: 'render-event',
 					headless: true,

@@ -9,4 +9,8 @@ export default class GameService {
 	gameList() {
 		return this.request.get(this.namespace + '/gameList');
 	}
+
+	rankList(gameId) {
+		return this.request.get(this.namespace + '/rankList', { gameId });
+	}
 }

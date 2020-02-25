@@ -10,17 +10,29 @@
 			v-col.services.d-inline-flex(:cols="gameList.filter(({type}) => type === 2).length")
 				v-item(v-for="game in gameList.filter(({type}) => type === 2)" :key="game.id")
 					router-link.box(:class="{active: game.id === $route.query.id || game.id === search.id}" :to="{name: 'players', query:{id: game.id}}" exact)
-						v-avatar
-							v-img(:src="game.unselectIcon")
+						v-img.img(:src="game.unselectIcon")
 						.label.mt-2(v-text="game.name")
+		v-row.justify-space-between
+			v-col.rank.d-inline-flex(:cols="rankList.length + 1")
+				v-item
+					.box.active 全部
+				v-item(v-for="rank in rankList" :key="rank.rankId")
+					.box {{rank.rankName}}
+			v-col.gender.d-inline-flex(cols="3")
+				v-item
+					.box.active 全部
+				v-item
+					.box 男
+				v-item
+					.box 女
 	v-item-group.grid-content(key="content")
 		v-item(v-for="player in playerList.list" :key="player.playerNo")
 			v-card(hover)
 				v-img.hover.white--text.align-end(:src="player.imageUrl[0]" aspect-ratio="1")
 					.mask.pa-2(v-text="player.rankName")
 				v-card-text.d-flex.justify-space-between
-					div.black--text(v-text="player.nickname")
-					b.black--text.large(v-text="player.gameName")
+					div.card-title.black--text(v-text="player.nickname")
+					b.nowrap.ml-2.black--text.large(v-text="player.gameName")
 				v-card-actions
 					.voice.brown--text {{player.duration}}s
 						svg.icon(aria-hidden="true")
@@ -36,21 +48,22 @@ import { mapState, mapActions } from 'vuex';
 export default {
 	name: 'players',
 	computed: {
-		...mapState('game', ['gameList', 'search']),
+		...mapState('game', ['gameList', 'search', 'rankList']),
 		...mapState('player', ['playerList']),
 	},
 	watch: {
 		async $route(now) {
 			await this.activeSearch(now.query.id);
 			await this.getPlayerList();
+			await this.getRankList();
 		},
 	},
 	methods: {
-		...mapActions('game', ['getGameList', 'activeSearch']),
+		...mapActions('game', ['getGameList', 'getRankList', 'activeSearch']),
 		...mapActions('player', ['getPlayerList']),
 	},
 	async mounted() {
-		Promise.all([this.getPlayerList()]);
+		await this.getPlayerList();
 	},
 };
 </script>
@@ -60,13 +73,18 @@ export default {
 	flex-direction: column;
 	align-items: center;
 	padding-bottom: 16px;
+	.row::v-deep {
+		& + .row {
+			margin-top: 10px;
+			height: 90px;
+		}
+	}
 }
 .header-bars {
 	width: 1400px;
-	height: 250px;
 	.game {
 		border: 2px solid var(--v-primary-base);
-		border-radius: 0 50px 50px 0;
+		border-radius: 0 50px 0 0;
 		position: relative;
 		padding: 8px 32px 0 32px;
 		.box.active {
@@ -89,7 +107,7 @@ export default {
 	}
 	.services {
 		border: 2px solid var(--v-accent-base);
-		border-radius: 50px 0 0 50px;
+		border-radius: 50px 0 0 0;
 		position: relative;
 		padding: 8px 32px 0 32px;
 		.box.active {
@@ -108,6 +126,52 @@ export default {
 			text-align: center;
 			background-color: var(--v-accent-base);
 			color: var(--v-accent-darken4);
+		}
+	}
+	.rank {
+		border: 2px solid var(--v-secondary-base);
+		border-radius: 0 0 50px 0;
+		position: relative;
+		padding: 8px 32px 0 32px;
+		.box.active {
+			border-color: var(--v-secondary-base);
+			color: var(--v-secondary-darken4);
+		}
+		&::before {
+			content: '陪玩段位';
+			position: absolute;
+			width: 24px;
+			height: 100%;
+			left: 0;
+			top: 0;
+			padding: 4px;
+			line-height: 1.3;
+			text-align: center;
+			background-color: var(--v-secondary-base);
+			color: var(--v-secondary-darken4);
+		}
+	}
+	.gender {
+		border: 2px solid var(--v-info-base);
+		border-radius: 0 0 0 50px;
+		position: relative;
+		padding: 8px 32px 0 32px;
+		.box.active {
+			border-color: var(--v-info-base);
+			color: var(--v-info-darken4);
+		}
+		&::before {
+			content: '陪玩性别';
+			position: absolute;
+			width: 24px;
+			height: 100%;
+			right: 0;
+			top: 0;
+			padding: 4px;
+			line-height: 1.3;
+			text-align: center;
+			background-color: var(--v-info-base);
+			color: var(--v-info-darken4);
 		}
 	}
 	.box {

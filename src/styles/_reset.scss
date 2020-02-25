@@ -15,6 +15,15 @@
 		}
 	}
 }
+.v-card {
+	&__text {
+		.card-title {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
+}
 
 a {
 	text-decoration: none;
