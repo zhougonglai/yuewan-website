@@ -6,7 +6,7 @@ if (process.env.NODE_ENV === 'production') {
 	register(
 		`${process.env.BASE_URL}service-worker.js?v=${
 			pkg.version
-		}&t=${new Date().toLocaleString()}`,
+		}&t=${new Date().toString()}`,
 		{
 			ready() {
 				console.log(

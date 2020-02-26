@@ -19,7 +19,7 @@ if (isProd()) {
 	const banner = new webpack.BannerPlugin({
 		banner: `Current version ${
 			pkg.version
-		} and build time ${new Date().toLocaleString()}`,
+		} and build time ${new Date().toString()}`,
 	});
 	const prerender = new PrerenderSPAPlugin({
 		staticDir: resolve('dist'),
