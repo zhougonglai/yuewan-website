@@ -53,13 +53,11 @@ export default {
 				waveShaper.connect(biquadFilter);
 				biquadFilter.connect(gain);
 				gain.connect(audioContext.destination);
-				console.log('source', this.source);
 				this.microphone.start();
 				this.loading = false;
 				this.recording = true;
 				this.microphone.addEventListener('dataavailable', ev => {
 					const file = URL.createObjectURL(ev.data);
-					console.log('file', file);
 					this.audios.push(file);
 				});
 			}
@@ -67,7 +65,6 @@ export default {
 	},
 	async mounted() {
 		this.devices = await navigator.mediaDevices.enumerateDevices();
-		console.log(this.devices);
 	},
 };
 </script>
