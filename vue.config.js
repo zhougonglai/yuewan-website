@@ -13,6 +13,42 @@ const resolve = dir => {
 	return path.join(__dirname, './', dir);
 };
 
+const plugins = [];
+
+if (isProd()) {
+	const banner = new webpack.BannerPlugin({
+		banner: `Current version ${
+			pkg.version
+		} and build time ${new Date().toLocaleString()}`,
+	});
+	const prerender = new PrerenderSPAPlugin({
+		staticDir: resolve('dist'),
+		routes: ['/', '/players', '/recharge'],
+		postProcess(renderedRoute) {
+			renderedRoute.route = renderedRoute.originalRoute;
+			renderedRoute.html = renderedRoute.html.replace(
+				/<title>[^<]*<\/title>/i,
+				'<title>' + routes[renderedRoute.route].title + '</title>',
+			);
+			if (renderedRoute.route.endsWith('.html')) {
+				renderedRoute.outputPath = path.join(
+					__dirname,
+					'dist',
+					renderedRoute.route,
+				);
+			}
+
+			return renderedRoute;
+		},
+		renderer: new Renderer({
+			maxConcurrentRoutes: 4,
+			renderAfterDocumentEvent: 'render-event',
+			headless: true,
+		}),
+	});
+	plugins.push(banner, prerender);
+}
+
 module.exports = {
 	transpileDependencies: ['vuetify'],
 	devServer: {
@@ -77,37 +113,6 @@ module.exports = {
 				},
 			},
 		},
-		plugins: [
-			new webpack.BannerPlugin({
-				banner: `Current version ${
-					pkg.version
-				} and build time ${new Date().toLocaleString()}`,
-			}),
-			new PrerenderSPAPlugin({
-				staticDir: resolve('dist'),
-				routes: ['/', '/players', '/recharge'],
-				postProcess(renderedRoute) {
-					renderedRoute.route = renderedRoute.originalRoute;
-					renderedRoute.html = renderedRoute.html.replace(
-						/<title>[^<]*<\/title>/i,
-						'<title>' + routes[renderedRoute.route].title + '</title>',
-					);
-					if (renderedRoute.route.endsWith('.html')) {
-						renderedRoute.outputPath = path.join(
-							__dirname,
-							'dist',
-							renderedRoute.route,
-						);
-					}
-
-					return renderedRoute;
-				},
-				renderer: new Renderer({
-					maxConcurrentRoutes: 4,
-					renderAfterDocumentEvent: 'render-event',
-					headless: true,
-				}),
-			}),
-		],
+		plugins,
 	},
 };
