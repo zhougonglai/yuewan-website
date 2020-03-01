@@ -20,9 +20,9 @@
 <script>
 const audioContext = new AudioContext();
 const analyser = audioContext.createAnalyser();
-analyser.minDecibels = -90;
-analyser.maxDecibels = -10;
-analyser.smoothingTimeConstant = 0.85;
+// analyser.minDecibels = -90;
+// analyser.maxDecibels = -10;
+// analyser.smoothingTimeConstant = 0.85;
 const distortion = audioContext.createWaveShaper();
 const gainNode = audioContext.createGain();
 const biquadFilter = audioContext.createBiquadFilter();
@@ -68,27 +68,28 @@ export default {
 		},
 		visualize() {
 			this.source = audioContext.createMediaStreamSource(this.stream);
-			this.source.connect(analyser);
-			analyser.connect(distortion);
-			distortion.connect(biquadFilter);
-			biquadFilter.connect(gainNode);
-			convolver.connect(gainNode);
-			gainNode.connect(audioContext.destination);
 			this.draw();
 		},
 		draw() {
 			this.$nextTick(() => {
 				const { width, height } = this.$refs.draw;
 				const canvasCtx = this.$refs.draw.getContext('2d');
-				canvasCtx.clearRect(0, 0, width, height);
 				window.requestAnimationFrame(this.draw);
+				// connect
+				this.source.connect(analyser);
+				analyser.connect(distortion);
+				distortion.connect(biquadFilter);
+				biquadFilter.connect(gainNode);
+				convolver.connect(gainNode);
+				gainNode.connect(audioContext.destination);
+
+				canvasCtx.clearRect(0, 0, width, height);
 				const dataArray = new Uint8Array(analyser.fftSize);
 				analyser.getByteTimeDomainData(dataArray);
 
 				canvasCtx.fillStyle = 'transparent';
 				canvasCtx.fillRect(0, 0, width, height);
 				canvasCtx.lineWidth = 1;
-				// canvasCtx.globalAlpha = 0.5;
 				canvasCtx.strokeStyle = 'rgb(255, 211, 62)'; // rgb(0, 0, 0)
 				canvasCtx.beginPath();
 
@@ -182,8 +183,7 @@ export default {
 #draw {
 	position: absolute;
 	bottom: 0;
-	left: 25vw;
-	width: 50vw;
+	width: 1024px;
 	height: 50px;
 	&::before {
 		content: '•••';
