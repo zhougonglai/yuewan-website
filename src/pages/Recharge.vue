@@ -9,10 +9,15 @@
 				v-list-item-group(v-model="device.deviceId")
 					v-list-item(v-for="device in devices.filter(device => device.kind === 'audioinput')" :key="device.deviceId" :value="device.deviceId")
 						v-list-item-title {{device.label}}
+		v-btn-toggle.types(shaped mandatory borderless v-model="type")
+			v-btn(icon value="timeline")
+				v-icon timeline
+			v-btn(icon value="equalizer")
+				v-icon equalizer
 		canvas#draw(ref="draw")
-		v-btn.wave(fab outlined color="primary" :loading="loading" @click="recordingAction")
+		v-btn(outlined color="primary" :loading="loading" @click="recordingAction") {{recording ? performance.toFixed(1) + 's' : '开始录音' }}
 			v-icon(dark v-if="recording") stop
-			v-icon(dark v-else) keyboard_voice
+			v-icon.wave(dark v-else) keyboard_voice
 	.files(v-if="audios.length")
 		.file(v-for="(audio, i) in audios" :key="i")
 			audio(controls :src="audio")
@@ -20,9 +25,6 @@
 <script>
 const audioContext = new AudioContext();
 const analyser = audioContext.createAnalyser();
-// analyser.minDecibels = -90;
-// analyser.maxDecibels = -10;
-// analyser.smoothingTimeConstant = 0.85;
 const distortion = audioContext.createWaveShaper();
 const gainNode = audioContext.createGain();
 const biquadFilter = audioContext.createBiquadFilter();
@@ -32,6 +34,7 @@ export default {
 	name: 'Recharge',
 	data() {
 		return {
+			type: 'timeline',
 			devices: [],
 			device: {},
 			recording: false,
@@ -40,6 +43,8 @@ export default {
 			microphone: null,
 			source: null,
 			audios: [],
+			performance: 0.0,
+			timing: 0,
 		};
 	},
 	methods: {
@@ -47,8 +52,18 @@ export default {
 			if (this.recording) {
 				this.microphone.stop();
 				// this.microphone.requestData();
+				clearInterval(this.timing);
+				this.timing = 0;
+				this.performance = 0;
 				this.recording = false;
 			} else {
+				this.timing = setInterval(() => {
+					if (this.performance > 60) {
+						this.recordingAction();
+					} else {
+						this.performance += 0.1;
+					}
+				}, 100);
 				this.loading = true;
 				this.stream = await navigator.mediaDevices.getUserMedia({
 					audio: true,
@@ -68,6 +83,14 @@ export default {
 		},
 		visualize() {
 			this.source = audioContext.createMediaStreamSource(this.stream);
+			// connect
+			this.source.connect(analyser);
+			analyser.connect(distortion);
+			distortion.connect(biquadFilter);
+			biquadFilter.connect(gainNode);
+			convolver.connect(gainNode);
+			gainNode.connect(audioContext.destination);
+
 			this.draw();
 		},
 		draw() {
@@ -75,40 +98,56 @@ export default {
 				const { width, height } = this.$refs.draw;
 				const canvasCtx = this.$refs.draw.getContext('2d');
 				window.requestAnimationFrame(this.draw);
-				// connect
-				this.source.connect(analyser);
-				analyser.connect(distortion);
-				distortion.connect(biquadFilter);
-				biquadFilter.connect(gainNode);
-				convolver.connect(gainNode);
-				gainNode.connect(audioContext.destination);
 
 				canvasCtx.clearRect(0, 0, width, height);
-				const dataArray = new Uint8Array(analyser.fftSize);
-				analyser.getByteTimeDomainData(dataArray);
 
-				canvasCtx.fillStyle = 'transparent';
-				canvasCtx.fillRect(0, 0, width, height);
-				canvasCtx.lineWidth = 1;
-				canvasCtx.strokeStyle = 'rgb(255, 211, 62)'; // rgb(0, 0, 0)
-				canvasCtx.beginPath();
+				if (this.type === 'timeline') {
+					const dataArray = new Uint8Array(analyser.fftSize);
+					analyser.getByteTimeDomainData(dataArray);
 
-				const sliceWidth = (width * 1) / analyser.fftSize;
-				let x = 0;
-				for (let i = 0; i < analyser.fftSize; i++) {
-					const v = dataArray[i] / 128.0;
-					const y = (v * height) / 2;
-					if (i === 0) {
-						canvasCtx.moveTo(x, y);
-					} else {
-						canvasCtx.lineTo(x, y);
+					canvasCtx.fillStyle = 'transparent';
+					canvasCtx.fillRect(0, 0, width, height);
+					canvasCtx.lineWidth = 1;
+					canvasCtx.strokeStyle = 'rgb(255, 211, 62)'; // rgb(0, 0, 0)
+					canvasCtx.beginPath();
+
+					const sliceWidth = (width * 1) / analyser.fftSize;
+					let x = 0;
+					for (let i = 0; i < analyser.fftSize; i++) {
+						const v = dataArray[i] / 128.0;
+						const y = (v * height) / 2;
+						if (i === 0) {
+							canvasCtx.moveTo(x, y);
+						} else {
+							canvasCtx.lineTo(x, y);
+						}
+
+						x += sliceWidth;
 					}
 
-					x += sliceWidth;
-				}
+					canvasCtx.lineTo(width, height / 2);
+					canvasCtx.stroke();
+				} else {
+					analyser.fftSize = 256;
+					const bufferLength = analyser.frequencyBinCount;
+					const dataArray = new Uint8Array(bufferLength);
+					analyser.getByteFrequencyData(dataArray);
 
-				canvasCtx.lineTo(width, height / 2);
-				canvasCtx.stroke();
+					canvasCtx.fillStyle = 'transparent';
+					canvasCtx.fillRect(0, 0, width, height);
+
+					const barWidth = (width / bufferLength) * 2;
+					let barHeight;
+					let x = 0;
+					for (let i = 0; i < bufferLength; i++) {
+						barHeight = dataArray[i] / 2;
+
+						canvasCtx.fillStyle = 'rgb(' + (barHeight + 100) + ', 211, 62)';
+						canvasCtx.fillRect(x, height - barHeight / 2, barWidth, barHeight);
+
+						x += barWidth + 1;
+					}
+				}
 			});
 		},
 	},
@@ -142,9 +181,10 @@ export default {
 				75% -130px no-repeat,
 			radial-gradient(ellipse at center, #1a2f7d 0, #232b56 100%);
 	}
+
 	.wave {
 		position: relative;
-		&::after {
+		&::before {
 			content: '';
 			border-radius: 50%;
 			background-color: var(--v-primary-base);
@@ -158,6 +198,11 @@ export default {
 		}
 	}
 
+	.types {
+		position: absolute;
+		left: 15px;
+		bottom: 15px;
+	}
 	.setting {
 		bottom: 15px;
 		right: 15px;
